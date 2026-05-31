@@ -47,18 +47,21 @@ class BimboOverlay(tk.Tk):
             x = random.randint(0, w)
             y = random.randint(0, h)
             heart = self.canvas.create_text(x, y, text="💖", fill="#FF69B4", font=("Segoe UI Emoji", 28))
-            self.hearts.append({"id": heart, "speed": random.uniform(0.8, 2.8), "drift": random.uniform(-1.2, 1.2)})
+            self.hearts.append({"id": heart, "x": x, "y": y, "speed": random.uniform(0.8, 2.8), "drift": random.uniform(-1.2, 1.2)})
         self.animate()
         self.bind("<Escape>", lambda e: self.destroy())
 
     def animate(self):
+        screen_h = self.winfo_screenheight()
+        screen_w = self.winfo_screenwidth()
         for h in self.hearts:
             self.canvas.move(h["id"], h["drift"], -h["speed"])
-            h["y"] = (h["y"] - h["speed"]) % (self.winfo_screenheight() + 50)
-            if h["y"] < 0:
-                new_x = random.randint(0, self.winfo_screenwidth())
-                self.canvas.coords(h["id"], new_x, self.winfo_screenheight() + 30)
-                h["y"] = self.winfo_screenheight() + 30
+            h["y"] -= h["speed"]
+            h["x"] += h["drift"]
+            if h["y"] < -20:
+                h["x"] = random.randint(0, screen_w)
+                h["y"] = screen_h + 30
+                self.canvas.coords(h["id"], h["x"], h["y"])
         self.after(35, self.animate)
 
 def main():
